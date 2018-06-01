@@ -1,13 +1,10 @@
 from django.contrib.auth.models import User
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import render
-from django.template import loader
 
 
 def main_page(request):
-    template = loader.get_template('bookmarks/main_page.html')
-
-    return HttpResponse(template.render({}, request))
+    return render(request, 'bookmarks/main_page.html', {})
 
 
 def user_page(request, username):
@@ -16,9 +13,8 @@ def user_page(request, username):
     except Exception:
         raise Http404('Requested user not found')
     bookmarks = user.bookmark_set.all()
-    template = loader.get_template('bookmarks/user_page.html')
     context = {
         'username': username,
         'bookmarks': bookmarks
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'bookmarks/user_page.html', context)

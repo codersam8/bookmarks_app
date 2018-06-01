@@ -18,8 +18,11 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 from django.urls import include, path
 
+from .views import logout_page
+
 urlpatterns = [
     path('bookmarks/', include('bookmarks.urls')),
     path('login/', login),
+    path('logout/', logout_page),
     path('admin/', admin.site.urls),
 ]
