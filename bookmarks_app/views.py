@@ -19,7 +19,7 @@ def register_page(request):
                 username=form.cleaned_data['username'],
                 password=form.cleaned_data['password1'],
                 email=form.cleaned_data['email'])
-            return HttpResponseRedirect('/bookmarks')
+            return HttpResponseRedirect('/register/success/')
     else:
         form = RegistrationForm()
     context = {'form': form}

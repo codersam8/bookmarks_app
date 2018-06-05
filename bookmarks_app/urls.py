@@ -19,6 +19,7 @@ import os
 from django.contrib import admin
 from django.contrib.auth.views import login
 from django.urls import include, path
+from django.views.generic import TemplateView
 from django.views.static import serve
 
 
@@ -31,6 +32,9 @@ site_media = os.path.join(
 urlpatterns = [
     path('bookmarks/', include('bookmarks.urls')),
     path('register/', register_page),
+    path('register/success/',
+         TemplateView.as_view(
+             template_name='registration/register_success.html')),
     path('login/', login),
     path('logout/', logout_page),
     path('admin/', admin.site.urls),
