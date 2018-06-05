@@ -22,7 +22,7 @@ from django.urls import include, path
 from django.views.static import serve
 
 
-from .views import logout_page
+from .views import logout_page, register_page
 
 site_media = os.path.join(
     os.path.dirname(__file__), 'site_media'
@@ -30,6 +30,7 @@ site_media = os.path.join(
 
 urlpatterns = [
     path('bookmarks/', include('bookmarks.urls')),
+    path('register/', register_page),
     path('login/', login),
     path('logout/', logout_page),
     path('admin/', admin.site.urls),
