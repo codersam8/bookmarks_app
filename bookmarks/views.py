@@ -43,7 +43,7 @@ def bookmark_save_page(request):
                 tag, dummy = Tag.objects.get_or_create(name=tag_name)
                 bookmark.tag_set.add(tag)
             bookmark.save()
-            return HttpResponseRedirect('/bookmarks')
+            return HttpResponseRedirect('/bookmarks/user/%s/' % request.user.username)
     else:
         form = BookmarkSaveForm()
         context = {
