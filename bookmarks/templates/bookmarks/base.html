@@ -11,12 +11,13 @@
 	<div id="nav">
 		<a href="/bookmarks">home</a>
 		{% if user.is_authenticated %}
-			welcome {{ user.username }}
-			(<a href="/logout">logout</a>)
-			{% else %}
+                    <a href="/bookmarks/save/">submit</a> |
+                    <a href="/bookmarks/user/{{ user.username }}">{{ user.username }}</a> |
+		    <a href="/logout">logout</a> | 
+		{% else %}
 		    <a href="/login/">login</a> |
                     <a href="/register/">register</a>
-			{% endif %}
+		{% endif %}
 		</div>
     <h1>{% block head %}{% endblock %}</h1>
     {% block content %}{% endblock %}

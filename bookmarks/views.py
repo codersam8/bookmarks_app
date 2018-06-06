@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
@@ -23,6 +24,7 @@ def user_page(request, username):
     return render(request, 'bookmarks/user_page.html', context)
 
 
+@login_required
 def bookmark_save_page(request):
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
