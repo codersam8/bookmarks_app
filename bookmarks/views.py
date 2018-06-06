@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
+
+from .models import Bookmark, Link, Tag
+from .forms import BookmarkSaveForm
 
 
 def main_page(request):
@@ -18,3 +21,29 @@ def user_page(request, username):
         'bookmarks': bookmarks
     }
     return render(request, 'bookmarks/user_page.html', context)
+
+
+def bookmark_save_page(request):
+    if request.method == 'POST':
+        form = BookmarkSaveForm(request.POST)
+        if form.is_valid():
+            link, is_created = Link.objects.get_or_create(
+                url=form.cleaned_data['url']
+            )
+            bookmark, is_b_created = Bookmark.objects.get_or_create(
+                user=request.user,
+                link=link)
+            bookmark.title = form.cleaned_data['title']
+            if not is_b_created:
+                bookmark.tag_set.clear()
+            tag_names = form.cleaned_data['tags'].split()
+            for tag_name in tag_names:
+                tag, dummy = Tag.objects.get_or_create(name=tag_name)
+                bookmark.tag_set.add(tag)
+            bookmark.save()
+            return HttpResponseRedirect('/bookmarks')
+    else:
+        form = BookmarkSaveForm()
+        context = {
+            'form': form}
+        return render(request, 'bookmarks/bookmark_save.html', context)
