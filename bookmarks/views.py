@@ -11,6 +11,29 @@ def main_page(request):
     return render(request, 'bookmarks/main_page.html', {})
 
 
+def tag_cloud_page(request):
+    MAX_WEIGHT = 5
+    tags = Tag.objects.order_by('name')
+    min_count = max_count = tags[0].bookmarks.count()
+    for tag in tags:
+        tag.count = tag.bookmarks.count()
+        if tag.count < min_count:
+            min_count = tag.count
+        if max_count < tag.count:
+            max_count = tag.count
+
+    tag_range = float(max_count - min_count)
+    if tag_range == 0.0:
+        tag_range = 1.0
+    for tag in tags:
+        tag.weight = int(
+            MAX_WEIGHT * (tag.count - min_count) / tag_range)
+    context = {
+        'tags': tags
+    }
+    return render(request, 'bookmarks/tag_cloud_page.html', context)
+
+
 def tag_page(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
     bookmarks = tag.bookmarks.order_by('-id')
