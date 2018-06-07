@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
 from .models import Bookmark, Link, Tag
 from .forms import BookmarkSaveForm
@@ -12,14 +12,12 @@ def main_page(request):
 
 
 def user_page(request, username):
-    try:
-        user = User.objects.get(username=username)
-    except Exception:
-        raise Http404('Requested user not found')
+    user = get_object_or_404(User, username=username)
     bookmarks = user.bookmark_set.all()
     context = {
         'username': username,
-        'bookmarks': bookmarks
+        'bookmarks': bookmarks,
+        'show_tags': True
     }
     return render(request, 'bookmarks/user_page.html', context)
 
