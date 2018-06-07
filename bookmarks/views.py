@@ -11,9 +11,21 @@ def main_page(request):
     return render(request, 'bookmarks/main_page.html', {})
 
 
+def tag_page(request, tag_name):
+    tag = get_object_or_404(Tag, name=tag_name)
+    bookmarks = tag.bookmarks.order_by('-id')
+    context = {
+        'bookmarks': bookmarks,
+        'tag_name': tag_name,
+        'show_tags': True,
+        'show_user': True
+    }
+    return render(request, 'bookmarks/tag_page.html', context)
+
+
 def user_page(request, username):
     user = get_object_or_404(User, username=username)
-    bookmarks = user.bookmark_set.all()
+    bookmarks = user.bookmark_set.order_by('-id')
     context = {
         'username': username,
         'bookmarks': bookmarks,
