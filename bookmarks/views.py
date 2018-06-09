@@ -75,33 +75,65 @@ def user_page(request, username):
     context = {
         'username': username,
         'bookmarks': bookmarks,
-        'show_tags': True
+        'show_tags': True,
+        'show_edit': username == request.user.username
     }
     return render(request, 'bookmarks/user_page.html', context)
 
 
 @login_required
 def bookmark_save_page(request):
+    ajax = 'ajax' in request.GET
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
         if form.is_valid():
-            link, is_created = Link.objects.get_or_create(
-                url=form.cleaned_data['url']
-            )
-            bookmark, is_b_created = Bookmark.objects.get_or_create(
-                user=request.user,
-                link=link)
-            bookmark.title = form.cleaned_data['title']
-            if not is_b_created:
-                bookmark.tag_set.clear()
-            tag_names = form.cleaned_data['tags'].split()
-            for tag_name in tag_names:
-                tag, dummy = Tag.objects.get_or_create(name=tag_name)
-                bookmark.tag_set.add(tag)
-            bookmark.save()
-            return HttpResponseRedirect('/bookmarks/user/%s/' % request.user.username)
+            bookmark = _bookmark_save(request, form)
+            if True:
+                context = {
+                    'bookmarks': [bookmark],
+                    'show_edit': True,
+                    'show_tags': True
+                }
+                return render(request,
+                              'bookmarks/bookmark_list.html', context)
+    elif 'url' in request.GET:
+        url = request.GET['url']
+        title = ''
+        tags = ''
+        try:
+            link = Link.objects.get(url=url)
+            bookmark = Bookmark.objects.get(
+                link=link,
+                user=request.user)
+            title = bookmark.title
+            tags = ' '.join(
+                tag.name for tag in bookmark.tag_set.all())
+        except ObjectDoesNotExist:
+            pass
+        form = BookmarkSaveForm({
+            'url': url,
+            'title': title,
+            'tags': tags})
     else:
         form = BookmarkSaveForm()
-        context = {
-            'form': form}
-        return render(request, 'bookmarks/bookmark_save.html', context)
+    context = {
+        'form': form}
+    return render(request, 'bookmarks/bookmark_save.html', context)
+
+
+def _bookmark_save(request, form):
+    link, is_created = Link.objects.get_or_create(
+        url=form.cleaned_data['url']
+    )
+    bookmark, is_b_created = Bookmark.objects.get_or_create(
+        user=request.user,
+        link=link)
+    bookmark.title = form.cleaned_data['title']
+    if not is_b_created:
+        bookmark.tag_set.clear()
+    tag_names = form.cleaned_data['tags'].split()
+    for tag_name in tag_names:
+        tag, dummy = Tag.objects.get_or_create(name=tag_name)
+        bookmark.tag_set.add(tag)
+    bookmark.save()
+    return bookmark
