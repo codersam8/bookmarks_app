@@ -5,7 +5,8 @@
                 <a href="{{ bookmark.link.url }}"
                    class="title">{{ bookmark.title }}</a>
                 {% if show_edit %}
-                    <a href="/bookmarks/save/?url={{ bookmark.link.url|urlencode }}">[edit]</a>
+                    <a href="/bookmarks/save/?url={{ bookmark.link.url|urlencode }}"
+                    class="edit">[edit]</a>
                 {% endif %}
                 <br />
                 {% if show_tags %}
