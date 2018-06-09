@@ -94,8 +94,8 @@ def bookmark_save_page(request):
                     'show_edit': True,
                     'show_tags': True
                 }
-                return render(request,
-                              'bookmarks/bookmark_list.html', context)
+                return HttpResponseRedirect(
+                    '/bookmarks/user/%s/' % request.user.username)
     elif 'url' in request.GET:
         url = request.GET['url']
         title = ''
