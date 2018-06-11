@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .views import (main_page, search_page,
+from .views import (ajax_tag_autocomplete,
+                    main_page, search_page,
                     user_page,
                     bookmark_save_page,
                     tag_page, tag_cloud_page)
@@ -8,6 +9,7 @@ from .views import (main_page, search_page,
 
 urlpatterns = [
     path('', main_page),
+    path('ajax/tag/autocomplete/', ajax_tag_autocomplete),
     path('save/', bookmark_save_page),
     path('search/', search_page),
     path('tags/', tag_cloud_page),

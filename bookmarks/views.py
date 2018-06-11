@@ -10,6 +10,14 @@ from .models import Bookmark, Link, Tag
 from .forms import BookmarkSaveForm, SearchForm
 
 
+def ajax_tag_autocomplete(request):
+    if 'term' in request.GET:
+        tags = \
+               Tag.objects.filter(name__istartswith=request.GET['term'])[:10]
+        all_tags = [tag.name for tag in tags]
+        return HttpResponse(json.dumps(all_tags))
+
+
 def main_page(request):
     return render(request, 'bookmarks/main_page.html', {})
 
