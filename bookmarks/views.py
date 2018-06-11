@@ -1,6 +1,9 @@
+import json
+
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
 from .models import Bookmark, Link, Tag
@@ -86,16 +89,27 @@ def bookmark_save_page(request):
     ajax = 'ajax' in request.GET
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
+        post_data = (request.read())
+        print('*' * 80)
+        print('post_data', post_data)
         if form.is_valid():
             bookmark = _bookmark_save(request, form)
-            if True:
+            # ajax = post_data['ajax']
+            if ajax:
                 context = {
                     'bookmarks': [bookmark],
                     'show_edit': True,
                     'show_tags': True
                 }
+                return render(request,
+                              'bookmarks/bookmark_list.html',
+                              context)
+            else:
                 return HttpResponseRedirect(
-                    '/bookmarks/user/%s/' % request.user.username)
+                    '/bookmarks/user/%s' % request.user.username)
+        else:
+            if ajax:
+                return HttpResponse('failure')
     elif 'url' in request.GET:
         url = request.GET['url']
         title = ''
@@ -118,7 +132,10 @@ def bookmark_save_page(request):
         form = BookmarkSaveForm()
     context = {
         'form': form}
-    return render(request, 'bookmarks/bookmark_save.html', context)
+    if ajax:
+        return render(request, 'bookmarks/bookmark_save_form.html', context)
+    else:
+        return render(request, 'bookmarks/bookmark_save.html', context)
 
 
 def _bookmark_save(request, form):
