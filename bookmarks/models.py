@@ -20,6 +20,15 @@ class Bookmark(models.Model):
                                                              self.link)
 
 
+class SharedBookmark(models.Model):
+    bookmark = models.ForeignKey(Bookmark,
+                                 on_delete=models.CASCADE,
+                                 unique=True)
+    date = models.DateTimeField(auto_now_add=True)
+    votes = models.IntegerField(default=1)
+    users_voted = models.ManyToManyField(User)
+
+
 class Tag(models.Model):
     name = models.CharField(max_length=64,
                             unique=True)

@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
-from .models import Bookmark, Link, Tag
+from .models import Bookmark, Link, SharedBookmark, Tag
 from .forms import BookmarkSaveForm, SearchForm
 
 
@@ -19,7 +19,12 @@ def ajax_tag_autocomplete(request):
 
 
 def main_page(request):
-    return render(request, 'bookmarks/main_page.html', {})
+    shared_bookmarks = SharedBookmark.objects.order_by(
+        '-date')
+    context = {
+        'shared_bookmarks': shared_bookmarks
+    }
+    return render(request, 'bookmarks/main_page.html', context)
 
 
 def tag_cloud_page(request):
@@ -160,5 +165,11 @@ def _bookmark_save(request, form):
     for tag_name in tag_names:
         tag, dummy = Tag.objects.get_or_create(name=tag_name)
         bookmark.tag_set.add(tag)
+    if form.cleaned_data['share']:
+        shared_bookmark, created = SharedBookmark.objects.get_or_create(
+            bookmark=bookmark)
+        if created:
+            shared_bookmark.users_voted.add(request.user)
+            shared_bookmark.save()
     bookmark.save()
     return bookmark
