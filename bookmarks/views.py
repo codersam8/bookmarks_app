@@ -3,7 +3,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
 from .models import Bookmark, Link, SharedBookmark, Tag
@@ -173,3 +173,22 @@ def _bookmark_save(request, form):
             shared_bookmark.save()
     bookmark.save()
     return bookmark
+
+
+@login_required
+def bookmark_vote_page(request):
+    if 'id' in request.GET:
+        try:
+            id = request.GET['id']
+            shared_bookmark = SharedBookmark.objects.get(id=id)
+            user_voted = shared_bookmark.users_voted.filter(
+                username=request.user.username)
+            if not user_voted:
+                shared_bookmark.votes += 1
+                shared_bookmark.users_voted.add(request.user)
+                shared_bookmark.save()
+        except:
+            raise Http404('Bookmark not found.')
+    if 'HTTP_REFERER' in request.META:
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    return HttpResponseRedirect('bookmarks/')
