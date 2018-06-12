@@ -5,12 +5,14 @@ from .views import (ajax_tag_autocomplete,
                     user_page,
                     bookmark_save_page,
                     bookmark_vote_page,
+                    popular_page,
                     tag_page, tag_cloud_page)
 
 
 urlpatterns = [
     path('', main_page),
     path('ajax/tag/autocomplete/', ajax_tag_autocomplete),
+    path('popular/', popular_page),
     path('save/', bookmark_save_page),
     path('search/', search_page),
     path('tags/', tag_cloud_page),

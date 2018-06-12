@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 
 
 from django.contrib.auth.decorators import login_required
@@ -192,3 +193,16 @@ def bookmark_vote_page(request):
     if 'HTTP_REFERER' in request.META:
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     return HttpResponseRedirect('bookmarks/')
+
+
+def popular_page(request):
+    today = datetime.today()
+    yesterday = today - timedelta(1)
+    shared_bookmarks = SharedBookmark.objects.filter(
+        date__gt=yesterday)
+    shared_bookmarks = shared_bookmarks.order_by(
+        '-votes')[:10]
+    context = {
+        'shared_bookmarks': shared_bookmarks
+    }
+    return render(request, 'bookmarks/popular_page.html', context)
