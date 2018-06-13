@@ -23,3 +23,21 @@ ul.tags, ul.tags li {
 ul.bookmarks .edit {
     font-size: 70%;
 }
+
+#tag-cloud {
+    text-align: center;
+}
+
+#tag-cloud a {
+    margin: 0 0.2em;
+}
+
+#id_honeypot {
+    display: none;
+}
+
+#id_comment {
+    margin: 1em;
+    padding: 5px;
+    border: 1px solid #000;
+}
