@@ -36,6 +36,7 @@
             {{ form.timestamp }}
             {{ form.security_hash }}
             <input type="submit" value="Add comment" id="id_submit" />
+            <input type="hidden" name="next" value="/bookmarks/">
         </form>
     {% else %}
         <p>Please <a href="/login/">log in</a> to post comments.</p>
