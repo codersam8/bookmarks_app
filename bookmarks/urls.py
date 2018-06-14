@@ -4,7 +4,7 @@ from django.urls import path
 from .views import (ajax_tag_autocomplete,
                     main_page, search_page,
                     user_page, bookmark_page,
-                    bookmark_save_page,
+                    bookmark_save_page, friends_page,
                     bookmark_vote_page,
                     popular_page,
                     tag_page, tag_cloud_page)
@@ -15,6 +15,7 @@ urlpatterns = [
     path('ajax/tag/autocomplete/', ajax_tag_autocomplete),
     path('bookmark/<int:bookmark_id>/', bookmark_page),
     path('comments/', include('django_comments.urls')),
+    path('friends/<str:username>/', friends_page),
     path('popular/', popular_page),
     path('save/', bookmark_save_page),
     path('search/', search_page),

@@ -215,3 +215,19 @@ def bookmark_page(request, bookmark_id):
         'shared_bookmark': shared_bookmark
     }
     return render(request, 'bookmarks/bookmark_page.html', context)
+
+
+def friends_page(request, username):
+    user = get_object_or_404(User, username=username)
+    friends = [friendship.to_friend for friendship in user.friend_set.all()]
+    friend_bookmarks = (Bookmark
+                        .objects
+                        .filter(user__in=friends).order_by('-id'))
+    context = {
+        'username': username,
+        'friends': friends,
+        'bookmarks': friend_bookmarks[:10],
+        'show_tags': True,
+        'show_user': True
+    }
+    return render(request, 'bookmarks/friends_page.html', context)
