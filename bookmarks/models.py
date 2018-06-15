@@ -1,5 +1,8 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.db import models
+from django.template.loader import get_template
 
 
 class Link(models.Model):
@@ -52,3 +55,32 @@ class Friendship(models.Model):
 
     class Meta:
         unique_together = (('to_friend', 'from_friend'), )
+
+
+class Invitation(models.Model):
+    name = models.CharField(max_length=50)
+    email = models.EmailField()
+    code = models.CharField(max_length=20)
+    sender = models.ForeignKey(User,
+                               on_delete=models.CASCADE)
+
+    def send(self):
+        subject = 'Invitation to join Django Bookmarks'
+        link = 'http://%s/bookmarks/friend/accept/%s/' % (
+            settings.SITE_HOST,
+            self.code
+        )
+        template = get_template('bookmarks/invitation_email.txt')
+        context = {
+            'name': self.name,
+            'link': link,
+            'sender': self.sender.username,
+        }
+        message = template.render(context)
+        resp = send_mail(
+            subject, message,
+            settings.DEFAULT_FROM_EMAIL, [self.email]
+        )
+
+    def __str__(self):
+        return '%s, %s' % (self.sender.username, self.email)

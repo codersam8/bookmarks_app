@@ -129,3 +129,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
+
+
+STATIC_URL = '/static/'
+LOGIN_URL = '/login/'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'freebusy3@gmail.com'
+EMAIL_HOST_PASSWORD = 'c0KW0*&L'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+SITE_HOST = '127.0.0.1:8000'
+DEFAULT_FROM_EMAIL = \
+                     'Django Bookmarks <django.bookmarks@example.com>'

@@ -1,14 +1,14 @@
 import json
 from datetime import datetime, timedelta
 
-
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
-from .models import Bookmark, Link, SharedBookmark, Tag
-from .forms import BookmarkSaveForm, SearchForm
+from .models import Bookmark, Friendship, Link, SharedBookmark, Tag, Invitation
+from .forms import BookmarkSaveForm, SearchForm, FriendInviteForm
 
 
 def ajax_tag_autocomplete(request):
@@ -88,10 +88,14 @@ def tag_page(request, tag_name):
 
 def user_page(request, username):
     user = get_object_or_404(User, username=username)
+    is_friend = Friendship.objects.filter(
+        from_friend=request.user,
+        to_friend=user)
     bookmarks = user.bookmark_set.order_by('-id')
     context = {
         'username': username,
         'bookmarks': bookmarks,
+        'is_friend': is_friend,
         'show_tags': True,
         'show_edit': username == request.user.username
     }
@@ -104,8 +108,6 @@ def bookmark_save_page(request):
     if request.method == 'POST':
         form = BookmarkSaveForm(request.POST)
         post_data = (request.read())
-        print('*' * 80)
-        print('post_data', post_data)
         if form.is_valid():
             bookmark = _bookmark_save(request, form)
             # ajax = post_data['ajax']
@@ -231,3 +233,68 @@ def friends_page(request, username):
         'show_user': True
     }
     return render(request, 'bookmarks/friends_page.html', context)
+
+
+@login_required
+def friend_add(request):
+    if 'username' in request.GET:
+        friend = \
+                 get_object_or_404(User, username=request.GET['username'])
+        friendship = Friendship(
+            from_friend=request.user,
+            to_friend=friend
+        )
+        try:
+            friendship.save()
+            # request.user.message_set.create(
+            #     request,
+            #     messages.INFO,
+            #     '%s was added to your friend list.' % friend.username
+            # )
+        except:
+            pass
+            # request.user.message_set.create(
+            #     request,
+            #     messages.ERROR,
+            #     '%s is already a friend of yours.' % friend.username
+            # )
+        return HttpResponseRedirect(
+            '/bookmarks/friends/%s/' % request.user.username
+        )
+    else:
+        raise Http404
+
+
+@login_required
+def friend_invite(request):
+    if request.method == 'POST':
+        form = FriendInviteForm(request.POST)
+        if form.is_valid():
+            invitation = Invitation(
+                name=form.cleaned_data['name'],
+                email=form.cleaned_data['email'],
+                code=User.objects.make_random_password(20),
+                sender=request.user
+            )
+            invitation.save()
+            try:
+                invitation.send()
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    'An invitation was sent to %s.' % invitation.email
+                )
+            except Exception as e:
+                )
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    'There was an error while sending the invitation.'
+                )
+            return HttpResponseRedirect('/bookmarks/friend/invite/')
+    else:
+        form = FriendInviteForm()
+    context = {
+        'form': form
+    }
+    return render(request, 'bookmarks/friend_invite.html', context)

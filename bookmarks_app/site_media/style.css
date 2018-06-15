@@ -24,6 +24,12 @@ ul.bookmarks .edit {
     font-size: 70%;
 }
 
+ul.messages {
+    border: 1px dashed #000;
+    margin: 1em 4em;
+    padding: 1em;
+}
+
 #tag-cloud {
     text-align: center;
 }
