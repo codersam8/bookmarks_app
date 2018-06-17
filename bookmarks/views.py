@@ -265,6 +265,12 @@ def friend_add(request):
         raise Http404
 
 
+def friend_accept(request, code):
+    invitation = get_object_or_404(Invitation, code__exact=code)
+    request.session['invitation'] = invitation.id
+    return HttpResponseRedirect('/register/')
+
+
 @login_required
 def friend_invite(request):
     if request.method == 'POST':
@@ -285,7 +291,6 @@ def friend_invite(request):
                     'An invitation was sent to %s.' % invitation.email
                 )
             except Exception as e:
-                )
                 messages.add_message(
                     request,
                     messages.ERROR,
